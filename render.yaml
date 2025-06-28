@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: smart-mask-recommendation
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app_flask_mask:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9.16 
