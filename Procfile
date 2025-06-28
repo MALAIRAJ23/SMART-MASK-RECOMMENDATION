@@ -1,0 +1,1 @@
+web: gunicorn app_flask_mask:app --bind 0.0.0.0:$PORT 
