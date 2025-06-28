@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "app_flask_mask.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "app_flask_mask.py"
+    }
+  ],
+  "functions": {
+    "app_flask_mask.py": {
+      "maxDuration": 30
+    }
+  }
+} 
