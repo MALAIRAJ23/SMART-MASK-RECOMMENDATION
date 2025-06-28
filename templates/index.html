@@ -1,0 +1,1669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#667eea">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Smart Mask Recommendation System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      --success-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+      --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+      --glass-bg: rgba(255, 255, 255, 0.1);
+      --glass-border: rgba(255, 255, 255, 0.2);
+      --shadow-light: 0 8px 32px rgba(31, 38, 135, 0.37);
+      --shadow-heavy: 0 20px 60px rgba(0, 0, 0, 0.3);
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.8);
+      --text-muted: rgba(255, 255, 255, 0.6);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--primary-gradient);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Animated Background Particles */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+      animation: float 6s ease-in-out infinite;
+      transition: all 0.3s ease;
+    }
+
+    .particle:nth-child(1) {
+      width: 80px;
+      height: 80px;
+      top: 20%;
+      left: 10%;
+      animation-delay: 0s;
+    }
+
+    .particle:nth-child(2) {
+      width: 120px;
+      height: 120px;
+      top: 60%;
+      right: 10%;
+      animation-delay: 2s;
+    }
+
+    .particle:nth-child(3) {
+      width: 60px;
+      height: 60px;
+      bottom: 20%;
+      left: 20%;
+      animation-delay: 4s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(180deg); }
+    }
+
+    /* Main Container */
+    .main-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      position: relative;
+    }
+
+    .container {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 30px;
+      box-shadow: var(--shadow-light);
+      padding: 3rem;
+      max-width: 600px;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .container:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-light);
+    }
+
+    /* Glowing Border Effect */
+    .container::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: var(--accent-gradient);
+      border-radius: 32px;
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .container:hover::before {
+      opacity: 0.3;
+    }
+
+    /* Header Section */
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+      position: relative;
+    }
+
+    .header h1 {
+      color: var(--text-primary);
+      font-size: 3rem;
+      font-weight: 900;
+      margin-bottom: 1rem;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 0 20px rgba(79, 172, 254, 0.3);
+      animation: gentle-glow 3s ease-in-out infinite alternate;
+    }
+
+    .header p {
+      color: var(--text-secondary);
+      font-size: 1.2rem;
+      font-weight: 400;
+      line-height: 1.6;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    @keyframes gentle-glow {
+      from { text-shadow: 0 0 15px rgba(79, 172, 254, 0.3); }
+      to { text-shadow: 0 0 25px rgba(79, 172, 254, 0.5); }
+    }
+
+    /* Form Styling */
+    .form-group {
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.8rem;
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      position: relative;
+    }
+
+    .form-group label i {
+      margin-right: 0.5rem;
+      color: #4facfe;
+      animation: gentle-pulse 3s infinite;
+    }
+
+    @keyframes gentle-pulse {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.05); opacity: 1; }
+    }
+
+    .select-wrapper {
+      position: relative;
+      transform-style: preserve-3d;
+    }
+
+    .select-wrapper::after {
+      content: '\f107';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+      transition: all 0.3s ease;
+      font-size: 1.2rem;
+    }
+
+    .select-wrapper:hover::after {
+      color: rgba(79, 172, 254, 0.7);
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    select {
+      width: 100%;
+      padding: 16px 18px;
+      background: var(--glass-bg);
+      border: 2px solid var(--glass-border);
+      border-radius: 15px;
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-weight: 500;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      appearance: none;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      min-height: 50px; /* Better touch target */
+    }
+
+    select:focus {
+      outline: none;
+      border-color: rgba(79, 172, 254, 0.6);
+      box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+      transform: translateY(-1px);
+    }
+
+    select:hover {
+      border-color: rgba(79, 172, 254, 0.4);
+      transform: translateY(-1px);
+    }
+
+    select option {
+      background: #2d3748;
+      color: var(--text-primary);
+      padding: 10px;
+    }
+
+    /* Button Styling */
+    .recommend-btn {
+      width: 100%;
+      padding: 18px;
+      background: var(--accent-gradient);
+      color: var(--text-primary);
+      border: none;
+      border-radius: 15px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 1.5rem;
+      min-height: 55px; /* Better touch target */
+    }
+
+    .recommend-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transition: left 0.5s;
+    }
+
+    .recommend-btn:hover::before {
+      left: 100%;
+    }
+
+    .recommend-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(79, 172, 254, 0.3);
+    }
+
+    .recommend-btn:active {
+      transform: translateY(-1px);
+    }
+
+    .recommend-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Loading Animation */
+    .loading {
+      display: none;
+      text-align: center;
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+    }
+
+    .loading.show {
+      display: block;
+      animation: fadeInUp 0.5s ease;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-left: 4px solid #4facfe;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    .loading p {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Result Container */
+    .result-container {
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+      border-radius: 15px;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(30px) scale(0.9);
+      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .result-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      z-index: -1;
+    }
+
+    .result-container.show {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .result-container.n95 {
+      border: 2px solid rgba(255, 107, 107, 0.3);
+    }
+
+    .result-container.n95::before {
+      background: linear-gradient(135deg, rgba(255, 107, 107, 0.2), rgba(238, 90, 36, 0.2));
+    }
+
+    .result-container.other {
+      border: 2px solid rgba(78, 205, 196, 0.3);
+    }
+
+    .result-container.other::before {
+      background: linear-gradient(135deg, rgba(78, 205, 196, 0.2), rgba(68, 160, 141, 0.2));
+    }
+
+    .result-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      animation: bounce 2s infinite;
+    }
+
+    .result-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 0.8rem;
+      color: var(--text-primary);
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .result-description {
+      font-size: 1rem;
+      line-height: 1.5;
+      color: var(--text-secondary);
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-10px); }
+      60% { transform: translateY(-5px); }
+    }
+
+    /* Info Section */
+    .info-section {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: var(--glass-bg);
+      border-radius: 15px;
+      border-left: 4px solid #4facfe;
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .info-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--accent-gradient);
+      opacity: 0.05;
+      z-index: -1;
+    }
+
+    .info-section h3 {
+      color: var(--text-primary);
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .info-section p {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .mask-types {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .mask-type {
+      background: var(--glass-bg);
+      padding: 1.5rem;
+      border-radius: 15px;
+      text-align: center;
+      border: 1px solid var(--glass-border);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mask-type::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--accent-gradient);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: -1;
+    }
+
+    .mask-type:hover {
+      transform: translateY(-3px);
+      border-color: rgba(79, 172, 254, 0.3);
+    }
+
+    .mask-type:hover::before {
+      opacity: 0.05;
+    }
+
+    .mask-type h4 {
+      color: var(--text-primary);
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .mask-type p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    /* Responsive Design - Mobile First Approach */
+    @media (max-width: 768px) {
+      .main-container {
+        padding: 10px;
+        min-height: 100vh;
+        align-items: flex-start;
+        padding-top: 20px;
+      }
+
+      .container {
+        padding: 1.5rem;
+        margin: 0;
+        border-radius: 20px;
+        max-width: 100%;
+        min-height: auto;
+      }
+
+      .container:hover {
+        transform: none;
+      }
+
+      .header {
+        margin-bottom: 2rem;
+      }
+
+      .header h1 {
+        font-size: 1.8rem;
+        line-height: 1.2;
+        margin-bottom: 0.8rem;
+      }
+
+      .header p {
+        font-size: 0.95rem;
+        line-height: 1.4;
+        max-width: 100%;
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .form-group label {
+        font-size: 0.9rem;
+        margin-bottom: 0.6rem;
+        letter-spacing: 0.5px;
+      }
+
+      .form-group label i {
+        font-size: 0.9rem;
+      }
+
+      .select-wrapper::after {
+        right: 15px;
+        font-size: 1rem;
+      }
+
+      .recommend-btn {
+        padding: 18px;
+        font-size: 1.1rem;
+        border-radius: 15px;
+        margin-top: 1.5rem;
+        min-height: 55px; /* Better touch target */
+      }
+
+      .recommend-btn:hover {
+        transform: none;
+      }
+
+      .loading {
+        margin-top: 1.5rem;
+        padding: 1.5rem;
+      }
+
+      .spinner {
+        width: 40px;
+        height: 40px;
+      }
+
+      .loading p {
+        font-size: 1rem;
+      }
+
+      .result-container {
+        margin-top: 1.5rem;
+        padding: 1.5rem;
+        border-radius: 15px;
+      }
+
+      .result-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+      }
+
+      .result-title {
+        font-size: 1.4rem;
+        margin-bottom: 0.8rem;
+      }
+
+      .result-description {
+        font-size: 1rem;
+        line-height: 1.5;
+        max-width: 100%;
+      }
+
+      .info-section {
+        margin-top: 2rem;
+        padding: 1.5rem;
+        border-radius: 15px;
+      }
+
+      .info-section h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.8rem;
+      }
+
+      .info-section p {
+        font-size: 0.9rem;
+        margin-bottom: 1.2rem;
+      }
+
+      .mask-types {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-top: 1.2rem;
+      }
+
+      .mask-type {
+        padding: 1.2rem;
+        border-radius: 12px;
+      }
+
+      .mask-type:hover {
+        transform: none;
+      }
+
+      .mask-type h4 {
+        font-size: 1rem;
+        margin-bottom: 0.4rem;
+      }
+
+      .mask-type p {
+        font-size: 0.85rem;
+      }
+
+      /* Reduce particle size on mobile */
+      .particle:nth-child(1) {
+        width: 40px;
+        height: 40px;
+      }
+
+      .particle:nth-child(2) {
+        width: 60px;
+        height: 60px;
+      }
+
+      .particle:nth-child(3) {
+        width: 30px;
+        height: 30px;
+      }
+
+      .particle:nth-child(4) {
+        width: 50px;
+        height: 50px;
+      }
+
+      /* Disable hover effects on mobile */
+      .container::before {
+        display: none;
+      }
+
+      .glow {
+        box-shadow: none;
+      }
+
+      .glow:hover {
+        box-shadow: none;
+      }
+    }
+
+    /* Extra small devices (phones, 480px and down) */
+    @media (max-width: 480px) {
+      .main-container {
+        padding: 5px;
+        padding-top: 10px;
+      }
+
+      .container {
+        padding: 1rem;
+        border-radius: 15px;
+      }
+
+      .header h1 {
+        font-size: 1.5rem;
+      }
+
+      .header p {
+        font-size: 0.9rem;
+      }
+
+      .form-group {
+        margin-bottom: 1.2rem;
+      }
+
+      .form-group label {
+        font-size: 0.85rem;
+      }
+
+      .select-wrapper::after {
+        right: 14px;
+        font-size: 0.95rem;
+      }
+
+      .recommend-btn {
+        padding: 16px;
+        font-size: 1rem;
+        min-height: 52px;
+      }
+
+      .result-container {
+        padding: 1.2rem;
+      }
+
+      .result-icon {
+        font-size: 2.5rem;
+      }
+
+      .result-title {
+        font-size: 1.2rem;
+      }
+
+      .result-description {
+        font-size: 0.9rem;
+      }
+
+      .info-section {
+        padding: 1.2rem;
+      }
+
+      .mask-type {
+        padding: 1rem;
+      }
+    }
+
+    /* Landscape orientation on mobile */
+    @media (max-width: 768px) and (orientation: landscape) {
+      .main-container {
+        padding: 5px;
+        align-items: center;
+      }
+
+      .container {
+        padding: 1rem;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      .header {
+        margin-bottom: 1rem;
+      }
+
+      .header h1 {
+        font-size: 1.4rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .header p {
+        font-size: 0.85rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .form-group {
+        margin-bottom: 1rem;
+      }
+
+      .select-wrapper::after {
+        right: 12px;
+        font-size: 0.95rem;
+      }
+
+      .recommend-btn {
+        padding: 14px;
+        margin-top: 1rem;
+        min-height: 48px;
+      }
+
+      .info-section {
+        margin-top: 1rem;
+        padding: 1rem;
+      }
+
+      .mask-types {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.8rem;
+      }
+    }
+
+    /* Tablet devices (768px to 1024px) */
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .container {
+        max-width: 500px;
+        padding: 2.5rem;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+      }
+
+      .header p {
+        font-size: 1.1rem;
+      }
+
+      .mask-types {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.2rem;
+      }
+    }
+
+    /* Large screens (1025px and up) */
+    @media (min-width: 1025px) {
+      .container {
+        max-width: 600px;
+        padding: 3rem;
+      }
+
+      .header h1 {
+        font-size: 3rem;
+      }
+
+      .header p {
+        font-size: 1.2rem;
+      }
+
+      .mask-types {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+      }
+    }
+
+    /* High DPI displays */
+    @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+      .container {
+        border-width: 0.5px;
+      }
+
+      select {
+        border-width: 1px;
+      }
+    }
+
+    /* Reduced motion for accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+
+      .particle {
+        animation: none;
+      }
+
+      .floating {
+        animation: none;
+      }
+
+      .header h1 {
+        animation: none;
+      }
+
+      .form-group label i {
+        animation: none;
+      }
+
+      .result-icon {
+        animation: none;
+      }
+    }
+
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --glass-bg: rgba(0, 0, 0, 0.2);
+        --glass-border: rgba(255, 255, 255, 0.1);
+      }
+    }
+
+    /* Touch device optimizations */
+    @media (hover: none) and (pointer: coarse) {
+      .container:hover {
+        transform: none;
+      }
+
+      .mask-type:hover {
+        transform: none;
+      }
+
+      .recommend-btn:hover {
+        transform: none;
+      }
+
+      select:hover {
+        transform: none;
+      }
+
+      /* Increase touch targets */
+      select {
+        min-height: 44px;
+      }
+
+      .recommend-btn {
+        min-height: 44px;
+      }
+
+      .mask-type {
+        min-height: 80px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+    }
+
+    /* Print styles */
+    @media print {
+      .particles {
+        display: none;
+      }
+
+      .container {
+        background: white;
+        color: black;
+        box-shadow: none;
+        border: 1px solid #ccc;
+      }
+
+      .recommend-btn {
+        background: #333;
+        color: white;
+      }
+
+      .footer {
+        display: none;
+      }
+    }
+
+    /* Footer Styling */
+    .footer {
+      margin-top: 2rem;
+      padding: 1.5rem 0;
+      background: rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      transition: all 0.3s ease;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      gap: 1rem;
+      text-align: center;
+    }
+
+    .footer-text {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .developer-name {
+      color: var(--text-primary);
+      font-weight: 700;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 0.5px;
+    }
+
+    .separator {
+      color: var(--text-muted);
+      font-weight: 300;
+    }
+
+    .project-name {
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .footer-icons {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .footer-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+    }
+
+    .footer-icon:hover {
+      background: var(--accent-gradient);
+      color: var(--text-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
+    }
+
+    .footer-icon i {
+      font-size: 1rem;
+    }
+
+    /* Footer Responsive Design */
+    @media (max-width: 768px) {
+      .footer {
+        margin-top: 1.5rem;
+        padding: 1rem 0;
+      }
+
+      .footer-content {
+        padding: 0 1rem;
+        gap: 0.8rem;
+        text-align: center;
+      }
+
+      .footer-text {
+        font-size: 0.85rem;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .footer-icons {
+        gap: 0.8rem;
+        justify-content: center;
+      }
+
+      .footer-icon {
+        width: 32px;
+        height: 32px;
+      }
+
+      .footer-icon i {
+        font-size: 0.9rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .footer {
+        margin-top: 1.2rem;
+        padding: 0.8rem 0;
+      }
+
+      .footer-content {
+        padding: 0 0.8rem;
+        gap: 0.6rem;
+      }
+
+      .footer-text {
+        font-size: 0.8rem;
+        flex-direction: column;
+        gap: 0.3rem;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .separator {
+        display: none;
+      }
+
+      .footer-icons {
+        gap: 0.6rem;
+        justify-content: center;
+      }
+
+      .footer-icon {
+        width: 30px;
+        height: 30px;
+      }
+
+      .footer-icon i {
+        font-size: 0.85rem;
+      }
+    }
+
+    /* Landscape orientation adjustments */
+    @media (max-width: 768px) and (orientation: landscape) {
+      .footer {
+        margin-top: 1rem;
+        padding: 0.6rem 0;
+      }
+
+      .footer-content {
+        flex-direction: row;
+        justify-content: center;
+        gap: 1rem;
+      }
+
+      .footer-text {
+        font-size: 0.8rem;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .footer-icons {
+        justify-content: center;
+      }
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-in {
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    /* Floating Elements */
+    .floating {
+      animation: floating 3s ease-in-out infinite;
+    }
+
+    @keyframes floating {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-5px); }
+    }
+
+    /* Glow Effects */
+    .glow {
+      box-shadow: 0 0 15px rgba(79, 172, 254, 0.2);
+    }
+
+    .glow:hover {
+      box-shadow: 0 0 20px rgba(79, 172, 254, 0.3);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--accent-gradient);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+    /* Hover effects for desktop only */
+    @media (hover: hover) {
+      .footer-icon:hover {
+        background: var(--accent-gradient);
+        color: var(--text-primary);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
+      }
+    }
+
+    /* Touch device optimizations */
+    @media (hover: none) and (pointer: coarse) {
+      .footer-icon:active {
+        background: var(--accent-gradient);
+        color: var(--text-primary);
+        transform: scale(0.95);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Animated Background Particles -->
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+
+  <div class="main-container">
+    <div class="container fade-in">
+      <div class="header floating">
+        <h1><i class="fas fa-shield-virus"></i> Smart Mask Recommendation</h1>
+        <p>Get personalized mask recommendations based on your environment and health conditions</p>
+      </div>
+
+      <form id="maskForm">
+        <div class="form-group">
+          <label for="pollution">
+            <i class="fas fa-smog"></i> Air Pollution Level
+          </label>
+          <div class="select-wrapper">
+            <select id="pollution" name="pollution" required>
+              <option value="">Select pollution level</option>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="location">
+            <i class="fas fa-map-marker-alt"></i> Location Type
+          </label>
+          <div class="select-wrapper">
+            <select id="location" name="location" required>
+              <option value="">Select location</option>
+              <option value="Indoor">Indoor</option>
+              <option value="Outdoor">Outdoor</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="weather">
+            <i class="fas fa-cloud-sun"></i> Weather Condition
+          </label>
+          <div class="select-wrapper">
+            <select id="weather" name="weather" required>
+              <option value="">Select weather</option>
+              <option value="Dry">Dry</option>
+              <option value="Humid">Humid</option>
+              <option value="Rainy">Rainy</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="health">
+            <i class="fas fa-heartbeat"></i> Health Condition
+          </label>
+          <div class="select-wrapper">
+            <select id="health" name="health" required>
+              <option value="">Select health condition</option>
+              <option value="None">None</option>
+              <option value="Asthma">Asthma</option>
+              <option value="Allergy">Allergy</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="crowd">
+            <i class="fas fa-users"></i> Crowd Density
+          </label>
+          <div class="select-wrapper">
+            <select id="crowd" name="crowd" required>
+              <option value="">Select crowd density</option>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="recommend-btn glow" id="recommendBtn">
+          <i class="fas fa-search"></i> Get Recommendation
+        </button>
+      </form>
+
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Analyzing your conditions...</p>
+      </div>
+
+      <div class="result-container" id="resultContainer"></div>
+
+      <div class="info-section floating">
+        <h3><i class="fas fa-info-circle"></i> About Our Recommendations</h3>
+        <p>Our AI-powered system analyzes multiple factors to provide the most suitable mask recommendation for your specific situation.</p>
+        
+        <div class="mask-types">
+          <div class="mask-type glow">
+            <h4><i class="fas fa-shield-alt"></i> N95 Masks</h4>
+            <p>High filtration for severe conditions</p>
+          </div>
+          <div class="mask-type glow">
+            <h4><i class="fas fa-user-md"></i> Surgical Masks</h4>
+            <p>Good protection for moderate risk</p>
+          </div>
+          <div class="mask-type glow">
+            <h4><i class="fas fa-tshirt"></i> Cloth Masks</h4>
+            <p>Basic protection for low risk</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <div class="footer-content">
+          <div class="footer-text">
+            <span class="developer-name">MALAI RAJ R</span>
+            <span class="separator">•</span>
+            <span class="project-name">Smart Mask Prediction</span>
+          </div>
+          <div class="footer-icons">
+            <a href="https://github.com/malairaj" class="footer-icon" title="GitHub" target="_blank" rel="noopener">
+              <i class="fab fa-github"></i>
+            </a>
+            <a href="https://www.linkedin.com/in/malai-raj-8ba975292?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" class="footer-icon" title="LinkedIn" target="_blank" rel="noopener">
+              <i class="fab fa-linkedin"></i>
+            </a>
+            <a href="https://portfolio-malairaj.netlify.app/" class="footer-icon" title="Portfolio" target="_blank" rel="noopener">
+              <i class="fas fa-globe"></i>
+            </a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    // Get the trained hypothesis from the server
+    let trainedHypothesis = null;
+    let isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    let isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+    // Initialize the application
+    document.addEventListener('DOMContentLoaded', function() {
+      // Optimize for mobile performance
+      if (isMobile) {
+        document.body.classList.add('mobile-device');
+        // Reduce particle count on mobile for better performance
+        const particles = document.querySelectorAll('.particle');
+        particles.forEach((particle, index) => {
+          if (index > 2) particle.style.display = 'none';
+        });
+      }
+
+      // Fetch the trained hypothesis when page loads
+      fetch('/get_hypothesis')
+        .then(response => response.json())
+        .then(data => {
+          trainedHypothesis = data.hypothesis;
+          console.log('Trained hypothesis:', trainedHypothesis);
+        })
+        .catch(error => {
+          console.error('Error fetching hypothesis:', error);
+          // Fallback to default hypothesis
+          trainedHypothesis = ["High", "Outdoor", "Dry", "Asthma", "High"];
+        });
+
+      // Form submission handler
+      document.getElementById('maskForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        recommendMask();
+      });
+
+      // Add visual feedback for form interactions
+      const selects = document.querySelectorAll('select');
+      selects.forEach(select => {
+        select.addEventListener('change', function() {
+          if (this.value) {
+            this.style.borderColor = 'rgba(79, 172, 254, 0.6)';
+            this.parentElement.classList.add('glow');
+          } else {
+            this.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+            this.parentElement.classList.remove('glow');
+          }
+        });
+
+        // Add subtle floating animation on focus
+        select.addEventListener('focus', function() {
+          if (!isMobile) {
+            this.parentElement.style.transform = 'translateY(-2px)';
+          }
+        });
+
+        select.addEventListener('blur', function() {
+          this.parentElement.style.transform = 'translateY(0)';
+        });
+
+        // Mobile-specific optimizations
+        if (isMobile) {
+          select.addEventListener('touchstart', function() {
+            this.style.transform = 'scale(0.98)';
+          });
+
+          select.addEventListener('touchend', function() {
+            this.style.transform = 'scale(1)';
+          });
+        }
+      });
+
+      // Add subtle particle interaction (only on desktop)
+      if (!isMobile) {
+        const particles = document.querySelectorAll('.particle');
+        particles.forEach(particle => {
+          particle.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.1)';
+            this.style.background = 'rgba(79, 172, 254, 0.2)';
+          });
+
+          particle.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+            this.style.background = 'rgba(255, 255, 255, 0.08)';
+          });
+        });
+      }
+
+      // Mobile-specific button optimizations
+      const recommendBtn = document.getElementById('recommendBtn');
+      if (isMobile) {
+        recommendBtn.addEventListener('touchstart', function() {
+          this.style.transform = 'scale(0.98)';
+        });
+
+        recommendBtn.addEventListener('touchend', function() {
+          this.style.transform = 'scale(1)';
+        });
+      }
+
+      // Prevent zoom on double tap (mobile)
+      let lastTouchEnd = 0;
+      document.addEventListener('touchend', function (event) {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+          event.preventDefault();
+        }
+        lastTouchEnd = now;
+      }, false);
+
+      // Handle orientation change
+      window.addEventListener('orientationchange', function() {
+        setTimeout(function() {
+          window.scrollTo(0, 0);
+        }, 100);
+      });
+    });
+
+    function recommendMask() {
+      const form = document.getElementById('maskForm');
+      const loading = document.getElementById('loading');
+      const resultContainer = document.getElementById('resultContainer');
+      const recommendBtn = document.getElementById('recommendBtn');
+
+      // Validate form
+      const inputs = [
+        document.getElementById('pollution').value,
+        document.getElementById('location').value,
+        document.getElementById('weather').value,
+        document.getElementById('health').value,
+        document.getElementById('crowd').value
+      ];
+
+      if (inputs.some(input => !input)) {
+        // Create a beautiful error notification
+        showNotification('Please fill in all fields', 'error');
+        return;
+      }
+
+      // Show loading with enhanced animation
+      loading.classList.add('show');
+      resultContainer.classList.remove('show');
+      recommendBtn.disabled = true;
+      recommendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+      // Simulate processing time (shorter on mobile)
+      const processingTime = isMobile ? 1500 : 2000;
+      setTimeout(() => {
+        // Hide loading
+        loading.classList.remove('show');
+        recommendBtn.disabled = false;
+        recommendBtn.innerHTML = '<i class="fas fa-search"></i> Get Recommendation';
+
+        // Get recommendation
+        const isMatch = trainedHypothesis && inputs.every((val, i) => 
+          trainedHypothesis[i] === "?" || trainedHypothesis[i] === val
+        );
+
+        // Display result with enhanced animation
+        displayResult(isMatch);
+      }, processingTime);
+    }
+
+    function displayResult(isN95) {
+      const resultContainer = document.getElementById('resultContainer');
+      
+      if (isN95) {
+        resultContainer.className = 'result-container n95 show';
+        resultContainer.innerHTML = `
+          <div class="result-icon">🛡️</div>
+          <div class="result-title">N95 Mask Recommended</div>
+          <div class="result-description">
+            Based on your conditions, an N95 mask provides the highest level of protection. 
+            This is recommended for high-risk situations with severe air pollution, 
+            outdoor activities, or when you have respiratory conditions.
+          </div>
+        `;
+      } else {
+        resultContainer.className = 'result-container other show';
+        resultContainer.innerHTML = `
+          <div class="result-icon">😷</div>
+          <div class="result-title">Cloth or Surgical Mask</div>
+          <div class="result-description">
+            A cloth or surgical mask is sufficient for your current conditions. 
+            These provide good protection for moderate to low-risk situations 
+            and are more comfortable for extended wear.
+          </div>
+        `;
+      }
+
+      // Enhanced scroll animation (smoother on mobile)
+      if (isMobile) {
+        resultContainer.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' 
+        });
+      } else {
+        resultContainer.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' 
+        });
+      }
+
+      // Add celebration effect (reduced on mobile)
+      if (!isMobile) {
+        addCelebrationEffect();
+      }
+    }
+
+    function showNotification(message, type) {
+      // Create notification element
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: ${isMobile ? '10px' : '20px'};
+        right: ${isMobile ? '10px' : '20px'};
+        left: ${isMobile ? '10px' : 'auto'};
+        background: ${type === 'error' ? 'linear-gradient(135deg, #ff6b6b, #ee5a24)' : 'linear-gradient(135deg, #4ecdc4, #44a08d)'};
+        color: white;
+        padding: ${isMobile ? '0.8rem 1.5rem' : '1rem 2rem'};
+        border-radius: ${isMobile ? '12px' : '15px'};
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        z-index: 1000;
+        transform: translateX(${isMobile ? '100%' : '400px'});
+        transition: transform 0.3s ease;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+        font-size: ${isMobile ? '0.9rem' : '1rem'};
+        text-align: ${isMobile ? 'center' : 'left'};
+      `;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      // Animate in
+      setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+      }, 100);
+      
+      // Remove after 3 seconds
+      setTimeout(() => {
+        notification.style.transform = `translateX(${isMobile ? '100%' : '400px'})`;
+        setTimeout(() => {
+          if (notification.parentNode) {
+            document.body.removeChild(notification);
+          }
+        }, 300);
+      }, 3000);
+    }
+
+    function addCelebrationEffect() {
+      // Create confetti effect (reduced on mobile)
+      const confettiCount = isMobile ? 20 : 50;
+      for (let i = 0; i < confettiCount; i++) {
+        setTimeout(() => {
+          const confetti = document.createElement('div');
+          confetti.style.cssText = `
+            position: fixed;
+            width: ${isMobile ? '6px' : '10px'};
+            height: ${isMobile ? '6px' : '10px'};
+            background: ${['#4facfe', '#f093fb', '#43e97b', '#fa709a'][Math.floor(Math.random() * 4)]};
+            left: ${Math.random() * 100}vw;
+            top: -10px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1000;
+            animation: fall 3s linear forwards;
+          `;
+          
+          document.body.appendChild(confetti);
+          
+          setTimeout(() => {
+            if (confetti.parentNode) {
+              document.body.removeChild(confetti);
+            }
+          }, 3000);
+        }, i * (isMobile ? 80 : 50));
+      }
+    }
+
+    // Add CSS for confetti animation
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes fall {
+        to {
+          transform: translateY(100vh) rotate(360deg);
+        }
+      }
+      
+      .mobile-device .particle {
+        animation-duration: 8s;
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Enhanced page load animation (optimized for mobile)
+    document.addEventListener('DOMContentLoaded', function() {
+      const container = document.querySelector('.container');
+      container.style.opacity = '0';
+      container.style.transform = 'translateY(30px) scale(0.95)';
+      
+      setTimeout(() => {
+        container.style.transition = `all ${isMobile ? '0.6s' : '1s'} cubic-bezier(0.4, 0, 0.2, 1)`;
+        container.style.opacity = '1';
+        container.style.transform = 'translateY(0) scale(1)';
+      }, 200);
+    });
+  </script>
+</body>
+</html>
