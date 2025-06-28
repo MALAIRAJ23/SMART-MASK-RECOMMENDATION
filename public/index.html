@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#667eea">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Smart Mask Recommendation System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      --success-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+      --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+      --glass-bg: rgba(255, 255, 255, 0.1);
+      --glass-border: rgba(255, 255, 255, 0.2);
+      --shadow-light: 0 8px 32px rgba(31, 38, 135, 0.37);
+      --shadow-heavy: 0 20px 60px rgba(0, 0, 0, 0.3);
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.8);
+      --text-muted: rgba(255, 255, 255, 0.6);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--primary-gradient);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    .main-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      position: relative;
+    }
+
+    .container {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 30px;
+      box-shadow: var(--shadow-light);
+      padding: 3rem;
+      max-width: 600px;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+      position: relative;
+    }
+
+    .header h1 {
+      color: var(--text-primary);
+      font-size: 3rem;
+      font-weight: 900;
+      margin-bottom: 1rem;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 0 20px rgba(79, 172, 254, 0.3);
+    }
+
+    .header p {
+      color: var(--text-secondary);
+      font-size: 1.2rem;
+      font-weight: 400;
+      line-height: 1.6;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .form-group {
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.8rem;
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .form-group select {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--glass-border);
+      border-radius: 15px;
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .form-group select:focus {
+      outline: none;
+      border-color: #4facfe;
+      box-shadow: 0 0 20px rgba(79, 172, 254, 0.3);
+    }
+
+    .form-group select option {
+      background: #2a2a2a;
+      color: var(--text-primary);
+    }
+
+    .recommend-btn {
+      width: 100%;
+      padding: 1.2rem 2rem;
+      background: var(--accent-gradient);
+      border: none;
+      border-radius: 15px;
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 1rem;
+    }
+
+    .recommend-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(79, 172, 254, 0.4);
+    }
+
+    .result-container {
+      margin-top: 2rem;
+      padding: 2rem;
+      border-radius: 20px;
+      text-align: center;
+      display: none;
+      animation: slideIn 0.5s ease;
+    }
+
+    .result-container.show {
+      display: block;
+    }
+
+    .result-container.n95 {
+      background: var(--success-gradient);
+    }
+
+    .result-container.other {
+      background: var(--warning-gradient);
+    }
+
+    .result-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+
+    .result-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: white;
+    }
+
+    .result-description {
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.9);
+      line-height: 1.6;
+    }
+
+    .footer {
+      margin-top: 3rem;
+      text-align: center;
+      color: var(--text-secondary);
+    }
+
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-text {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .developer-name {
+      color: #4facfe;
+      font-weight: 600;
+    }
+
+    .separator {
+      margin: 0 0.5rem;
+      opacity: 0.5;
+    }
+
+    .project-name {
+      color: var(--text-secondary);
+    }
+
+    .footer-icons {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .footer-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      color: var(--text-primary);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .footer-icon:hover {
+      background: rgba(79, 172, 254, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .footer-icon i {
+      font-size: 1.2rem;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 2rem;
+        margin: 1rem;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+      }
+
+      .footer-content {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="main-container">
+    <div class="container">
+      <div class="header">
+        <h1>🛡️ Smart Mask Recommendation</h1>
+        <p>Get personalized face mask recommendations based on your environment and health conditions</p>
+      </div>
+
+      <form id="maskForm">
+        <div class="form-group">
+          <label for="pollution">🌫️ Air Pollution Level</label>
+          <select id="pollution" name="pollution" required>
+            <option value="">Select pollution level</option>
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="location">🏠 Location Type</label>
+          <select id="location" name="location" required>
+            <option value="">Select location</option>
+            <option value="Indoor">Indoor</option>
+            <option value="Outdoor">Outdoor</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="weather">🌤️ Weather Condition</label>
+          <select id="weather" name="weather" required>
+            <option value="">Select weather</option>
+            <option value="Dry">Dry</option>
+            <option value="Humid">Humid</option>
+            <option value="Rainy">Rainy</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="health">❤️ Health Condition</label>
+          <select id="health" name="health" required>
+            <option value="">Select health condition</option>
+            <option value="None">None</option>
+            <option value="Asthma">Asthma</option>
+            <option value="Allergy">Allergy</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="crowd">👥 Crowd Density</label>
+          <select id="crowd" name="crowd" required>
+            <option value="">Select crowd density</option>
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+          </select>
+        </div>
+
+        <button type="submit" class="recommend-btn">
+          <i class="fas fa-search"></i> Get Recommendation
+        </button>
+      </form>
+
+      <div id="resultContainer" class="result-container">
+        <!-- Results will be displayed here -->
+      </div>
+
+      <footer class="footer">
+        <div class="footer-content">
+          <div class="footer-text">
+            <span class="developer-name">MALAI RAJ R</span>
+            <span class="separator">•</span>
+            <span class="project-name">Smart Mask Prediction</span>
+          </div>
+          <div class="footer-icons">
+            <a href="https://github.com/MALAIRAJ23/SMART-MASK-RECOMMENDATION" class="footer-icon" title="GitHub" target="_blank" rel="noopener">
+              <i class="fab fa-github"></i>
+            </a>
+            <a href="https://www.linkedin.com/in/malai-raj-8ba975292?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" class="footer-icon" title="LinkedIn" target="_blank" rel="noopener">
+              <i class="fab fa-linkedin"></i>
+            </a>
+            <a href="https://portfolio-malairaj.netlify.app/" class="footer-icon" title="Portfolio" target="_blank" rel="noopener">
+              <i class="fas fa-globe"></i>
+            </a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('maskForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      const resultContainer = document.getElementById('resultContainer');
+      
+      // Simple client-side logic for demonstration
+      const pollution = formData.get('pollution');
+      const location = formData.get('location');
+      const weather = formData.get('weather');
+      const health = formData.get('health');
+      const crowd = formData.get('crowd');
+      
+      // Basic recommendation logic
+      let recommendation = 'Cloth or Surgical';
+      let isN95 = false;
+      
+      if (pollution === 'High' && (health === 'Asthma' || crowd === 'High')) {
+        recommendation = 'N95';
+        isN95 = true;
+      } else if (pollution === 'High' || health === 'Asthma' || health === 'Allergy') {
+        recommendation = 'Surgical';
+      }
+      
+      // Display result
+      resultContainer.className = `result-container ${isN95 ? 'n95' : 'other'} show`;
+      resultContainer.innerHTML = `
+        <div class="result-icon">${isN95 ? '🛡️' : '😷'}</div>
+        <div class="result-title">${recommendation}</div>
+        <div class="result-description">
+          ${isN95 ? 
+            'Maximum protection recommended for high-risk conditions. N95 masks provide superior filtration for airborne particles.' :
+            'Standard protection recommended. This mask type is suitable for your current conditions.'
+          }
+        </div>
+      `;
+      
+      // Scroll to result
+      resultContainer.scrollIntoView({ behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html> 

@@ -2,18 +2,26 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/[[path]].py",
+      "src": "public/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "api/index.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
+      "src": "/api/(.*)",
+      "dest": "/api/index.py"
+    },
+    {
       "src": "/(.*)",
-      "dest": "/api/[[path]].py"
+      "dest": "/public/index.html"
     }
   ],
   "functions": {
-    "api/[[path]].py": {
+    "api/index.py": {
       "maxDuration": 30
     }
   }
